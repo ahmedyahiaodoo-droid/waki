@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_waki_root" name="Waki Manufacturing"
+              web_icon="mrp,static/description/icon.png"
+              groups="group_waki_user" sequence="36"/>
+
+    <menuitem id="menu_waki_operations" name="Operations" parent="menu_waki_root" sequence="10"/>
+    <menuitem id="menu_waki_production" name="Waki Manufacturing Orders" action="action_waki_production"
+              parent="menu_waki_operations" sequence="10"/>
+    <menuitem id="menu_waki_receipts" name="Waki Receipts" action="action_waki_receipts"
+              parent="menu_waki_operations" sequence="20"/>
+    <menuitem id="menu_waki_adjustment" name="Waki Stock Adjustments" action="action_waki_adjustment"
+              parent="menu_waki_operations" sequence="30" groups="group_waki_manager"/>
+
+    <menuitem id="menu_waki_products" name="Products" parent="menu_waki_root" sequence="20"/>
+    <menuitem id="menu_waki_product_template" name="Waki Products" action="action_waki_product_template"
+              parent="menu_waki_products" sequence="10"/>
+    <menuitem id="menu_waki_bom" name="Shadow Bills of Materials" action="action_waki_bom"
+              parent="menu_waki_products" sequence="20"/>
+
+    <menuitem id="menu_waki_reporting" name="Reporting" parent="menu_waki_root" sequence="30"/>
+    <menuitem id="menu_waki_production_analysis" name="Waki Manufacturing Analysis"
+              action="action_waki_production_analysis" parent="menu_waki_reporting" sequence="10"/>
+    <menuitem id="menu_waki_stock" name="Waki Stock On Hand" action="action_waki_stock"
+              parent="menu_waki_reporting" sequence="20"/>
+    <menuitem id="menu_waki_move" name="Waki Moves History" action="action_waki_move"
+              parent="menu_waki_reporting" sequence="30"/>
+
+    <menuitem id="menu_waki_config" name="Configuration" parent="menu_waki_root"
+              sequence="100" groups="group_waki_manager"/>
+    <menuitem id="menu_waki_warehouse" name="Waki Warehouses" action="action_waki_warehouse"
+              parent="menu_waki_config" sequence="10"/>
+</odoo>

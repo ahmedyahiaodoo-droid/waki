@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_waki_production_list" model="ir.ui.view">
+        <field name="name">waki.production.list</field>
+        <field name="model">waki.production</field>
+        <field name="arch" type="xml">
+            <list string="Waki Manufacturing Orders" multi_edit="1">
+                <field name="priority" optional="show" widget="priority" nolabel="1"/>
+                <field name="name" decoration-bf="1"/>
+                <field name="date_planned" optional="show" widget="remaining_days" invisible="state in ('done', 'cancel')"/>
+                <field name="product_id"/>
+                <field name="origin" optional="show"/>
+                <field name="production_id" optional="show"/>
+                <field name="product_qty" sum="Total"/>
+                <field name="qty_producing" optional="hide"/>
+                <field name="qty_produced" sum="Total" optional="show"/>
+                <field name="date_deadline" optional="hide" widget="remaining_days" invisible="state in ('done', 'cancel')"/>
+                <field name="product_uom_id" groups="uom.group_uom" optional="show"/>
+                <field name="waki_warehouse_id" optional="show"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'" decoration-info="state in ('confirmed', 'progress')"
+                       decoration-warning="state == 'to_close'" decoration-muted="state == 'cancel'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_waki_production_kanban" model="ir.ui.view">
+        <field name="name">waki.production.kanban</field>
+        <field name="model">waki.production</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1">
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex">
+                            <field name="product_id" class="fw-bold"/>
+                            <field name="state" widget="label_selection" class="ms-auto"
+                                   options="{'classes': {'draft': 'default', 'confirmed': 'info', 'progress': 'info', 'to_close': 'warning', 'done': 'success', 'cancel': 'default'}}"/>
+                        </div>
+                        <div class="d-flex text-muted">
+                            <field name="name"/>
+                            <span class="ms-auto"><field name="product_qty"/> <field name="product_uom_id"/></span>
+                        </div>
+                        <footer>
+                            <field name="date_planned" widget="date"/>
+                            <field name="user_id" widget="many2one_avatar_user" class="ms-auto"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_waki_production_form" model="ir.ui.view">
+        <field name="name">waki.production.form</field>
+        <field name="model">waki.production</field>
+        <field name="arch" type="xml">
+            <form string="Waki Manufacturing Order">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state != 'draft' or production_id"/>
+                    <button name="action_mark_done" type="object" string="Produce All" class="btn-primary"
+                            invisible="state != 'confirmed' or production_id"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done', 'cancel') or production_id"/>
+                    <button name="action_draft" type="object" string="Set to Draft"
+                            invisible="state != 'cancel' or production_id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,progress,to_close,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_real_production" type="object" class="oe_stat_button"
+                                icon="fa-wrench" invisible="not production_id" string="Odoo MO"/>
+                        <button name="action_view_moves" type="object" class="oe_stat_button" icon="fa-exchange">
+                            <field name="move_count" widget="statinfo" string="Waki Moves"/>
+                        </button>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="not production_id">
+                        Synchronized with an Odoo manufacturing order: status, quantities, dates and
+                        responsible follow that order. Components stay frozen on the Waki standard BoM and
+                        are never changed by edits made during manufacturing in Odoo.
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="priority" widget="priority" class="me-3" readonly="production_id"/>
+                            <field name="name" placeholder="Waki Manufacturing Reference" nolabel="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="product_id" readonly="state != 'draft' or production_id"/>
+                            <field name="product_tmpl_id" invisible="1"/>
+                            <field name="product_uom_category_id" invisible="1"/>
+                            <label for="product_qty" string="Quantity"/>
+                            <div class="o_row">
+                                <field name="product_qty" class="oe_inline" readonly="state in ('done', 'cancel') or production_id"/>
+                                <field name="product_uom_id" class="oe_inline" groups="uom.group_uom"
+                                       readonly="state != 'draft' or production_id"/>
+                            </div>
+                            <field name="qty_producing" invisible="state in ('draft', 'done', 'cancel')"/>
+                            <field name="qty_produced" invisible="state != 'done'"/>
+                            <field name="is_posted" invisible="state != 'done'"/>
+                            <field name="waki_bom_id" readonly="state != 'draft' or production_id"/>
+                            <field name="bom_uom_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_planned" readonly="state in ('done', 'cancel') or production_id"/>
+                            <field name="date_finished_planned" readonly="production_id"/>
+                            <field name="date_deadline" readonly="production_id"/>
+                            <field name="date_done" invisible="state != 'done'"/>
+                            <field name="user_id" widget="many2one_avatar_user" readonly="production_id"/>
+                            <field name="waki_warehouse_id" readonly="state != 'draft' or production_id"/>
+                            <field name="origin" readonly="production_id"/>
+                            <field name="production_id" invisible="not production_id"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Components" name="components">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="product_id"/>
+                                    <field name="qty_per_unit" optional="hide"/>
+                                    <field name="qty_expected"/>
+                                    <field name="qty_consumed"/>
+                                    <field name="uom_id" groups="uom.group_uom"/>
+                                </list>
+                            </field>
+                            <p class="text-muted" invisible="line_ids or state != 'draft'">
+                                Components are loaded from the Waki Bill of Materials on confirmation.
+                            </p>
+                        </page>
+                        <page string="Waki Stock Moves" name="moves">
+                            <field name="move_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="product_id"/>
+                                    <field name="move_type"/>
+                                    <field name="direction"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id" groups="uom.group_uom"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_waki_production_search" model="ir.ui.view">
+        <field name="name">waki.production.search</field>
+        <field name="model">waki.production</field>
+        <field name="arch" type="xml">
+            <search string="Search Waki Manufacturing Orders">
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('origin', 'ilike', self)]"/>
+                <field name="product_id"/>
+                <field name="production_id"/>
+                <field name="waki_warehouse_id"/>
+                <filter name="todo" string="To Do" domain="[('state', 'not in', ('done', 'cancel'))]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="progress" string="In Progress" domain="[('state', '=', 'progress')]"/>
+                <filter name="to_close" string="To Close" domain="[('state', '=', 'to_close')]"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                <filter name="cancel" string="Cancelled" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <filter name="synced" string="Synced With Odoo MO" domain="[('production_id', '!=', False)]"/>
+                <filter name="manual" string="Manual" domain="[('production_id', '=', False)]"/>
+                <separator/>
+                <filter name="urgent" string="Urgent" domain="[('priority', '=', '1')]"/>
+                <separator/>
+                <filter name="date_planned" string="Scheduled Date" date="date_planned"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_wh" string="Waki Warehouse" context="{'group_by': 'waki_warehouse_id'}"/>
+                    <filter name="group_date" string="Scheduled Date" context="{'group_by': 'date_planned'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_waki_production_pivot" model="ir.ui.view">
+        <field name="name">waki.production.pivot</field>
+        <field name="model">waki.production</field>
+        <field name="arch" type="xml">
+            <pivot string="Waki Manufacturing Analysis" sample="1">
+                <field name="date_planned" type="row" interval="month"/>
+                <field name="product_qty" type="measure"/>
+                <field name="qty_produced" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_waki_production_graph" model="ir.ui.view">
+        <field name="name">waki.production.graph</field>
+        <field name="model">waki.production</field>
+        <field name="arch" type="xml">
+            <graph string="Waki Manufacturing Orders" sample="1">
+                <field name="date_planned" interval="month"/>
+                <field name="product_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_waki_production_calendar" model="ir.ui.view">
+        <field name="name">waki.production.calendar</field>
+        <field name="model">waki.production</field>
+        <field name="arch" type="xml">
+            <calendar date_start="date_planned" color="product_id" mode="month" quick_create="0">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="product_qty"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_waki_production" model="ir.actions.act_window">
+        <field name="name">Waki Manufacturing Orders</field>
+        <field name="res_model">waki.production</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph</field>
+        <field name="context">{'search_default_todo': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No Waki manufacturing order found</p>
+            <p>Waki orders are created automatically with Odoo manufacturing orders, or manually here.</p>
+        </field>
+    </record>
+
+    <record id="action_waki_production_analysis" model="ir.actions.act_window">
+        <field name="name">Waki Manufacturing Analysis</field>
+        <field name="res_model">waki.production</field>
+        <field name="view_mode">pivot,graph,list,form</field>
+        <field name="context">{'search_default_done': 1}</field>
+    </record>
+</odoo>

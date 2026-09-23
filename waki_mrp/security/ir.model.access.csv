@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_waki_warehouse_user,waki.warehouse user,model_waki_warehouse,group_waki_user,1,0,0,0
+access_waki_warehouse_manager,waki.warehouse manager,model_waki_warehouse,group_waki_manager,1,1,1,1
+access_waki_stock_user,waki.stock user,model_waki_stock,group_waki_user,1,0,0,0
+access_waki_move_user,waki.move user,model_waki_move,group_waki_user,1,0,0,0
+access_waki_move_manager,waki.move manager,model_waki_move,group_waki_manager,1,1,1,1
+access_waki_bom_user,waki.bom user,model_waki_bom,group_waki_user,1,0,0,0
+access_waki_bom_manager,waki.bom manager,model_waki_bom,group_waki_manager,1,1,1,1
+access_waki_bom_line_user,waki.bom.line user,model_waki_bom_line,group_waki_user,1,0,0,0
+access_waki_bom_line_manager,waki.bom.line manager,model_waki_bom_line,group_waki_manager,1,1,1,1
+access_waki_production_user,waki.production user,model_waki_production,group_waki_user,1,1,1,0
+access_waki_production_manager,waki.production manager,model_waki_production,group_waki_manager,1,1,1,1
+access_waki_production_line_user,waki.production.line user,model_waki_production_line,group_waki_user,1,1,1,1

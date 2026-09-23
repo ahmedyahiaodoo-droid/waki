@@ -1,0 +1,27 @@
+{
+    'name': 'Waki Manufacturing',
+    'version': '18.0.1.0.0',
+    'summary': 'Standalone Waki manufacturing app mirroring Odoo MRP: Waki MOs, Waki BoMs, '
+               'Waki warehouses consuming by the frozen standard BoM, no cost or real-stock impact',
+    'category': 'Manufacturing/Manufacturing',
+    'author': 'PomoTech',
+    'website': 'https://pomotech-eg.com',
+    'license': 'LGPL-3',
+    'depends': ['mrp', 'purchase_stock'],
+    'data': [
+        'security/waki_security.xml',
+        'security/ir.model.access.csv',
+        'data/ir_sequence.xml',
+        'views/waki_warehouse_views.xml',
+        'views/waki_stock_views.xml',
+        'views/waki_move_views.xml',
+        'views/waki_bom_views.xml',
+        'views/waki_production_views.xml',
+        'views/waki_product_views.xml',
+        'views/mrp_production_views.xml',
+        'views/waki_menus.xml',
+    ],
+    'post_init_hook': 'post_init_hook',
+    'installable': True,
+    'application': True,
+}

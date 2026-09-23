@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_waki_move_list" model="ir.ui.view">
+        <field name="name">waki.move.list</field>
+        <field name="model">waki.move</field>
+        <field name="arch" type="xml">
+            <list decoration-success="direction == 'in'" decoration-warning="direction == 'out'"
+                  decoration-muted="state == 'draft'">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="move_type"/>
+                <field name="origin"/>
+                <field name="waki_warehouse_id"/>
+                <field name="product_id"/>
+                <field name="direction"/>
+                <field name="quantity" sum="Total"/>
+                <field name="uom_id" groups="uom.group_uom"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_waki_move_form" model="ir.ui.view">
+        <field name="name">waki.move.form</field>
+        <field name="model">waki.move</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_done" type="object" string="Post" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="waki_warehouse_id" readonly="state == 'done'"/>
+                            <field name="product_id" readonly="state == 'done'"/>
+                            <label for="quantity"/>
+                            <div class="o_row">
+                                <field name="quantity" readonly="state == 'done'" class="oe_inline"/>
+                                <field name="uom_id" class="oe_inline"/>
+                            </div>
+                            <field name="direction" readonly="state == 'done'"/>
+                        </group>
+                        <group>
+                            <field name="move_type" readonly="1"/>
+                            <field name="date" readonly="state == 'done'"/>
+                            <field name="origin" readonly="state == 'done'"/>
+                            <field name="stock_move_id" invisible="not stock_move_id"/>
+                            <field name="waki_production_id" invisible="not waki_production_id"/>
+                            <field name="production_id" invisible="not production_id"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Reason for adjustment..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_waki_move_search" model="ir.ui.view">
+        <field name="name">waki.move.search</field>
+        <field name="model">waki.move</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="origin"/>
+                <field name="waki_warehouse_id"/>
+                <filter name="incoming" string="In" domain="[('direction', '=', 'in')]"/>
+                <filter name="outgoing" string="Out" domain="[('direction', '=', 'out')]"/>
+                <separator/>
+                <filter name="done" string="Posted" domain="[('state', '=', 'done')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Type" context="{'group_by': 'move_type'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_waki_move_pivot" model="ir.ui.view">
+        <field name="name">waki.move.pivot</field>
+        <field name="model">waki.move</field>
+        <field name="arch" type="xml">
+            <pivot string="Waki Moves Analysis">
+                <field name="product_id" type="row"/>
+                <field name="move_type" type="col"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_waki_move" model="ir.actions.act_window">
+        <field name="name">Waki Stock Moves</field>
+        <field name="res_model">waki.move</field>
+        <field name="view_mode">list,form,pivot</field>
+        <field name="context">{'search_default_done': 1}</field>
+    </record>
+    <record id="action_waki_receipts" model="ir.actions.act_window">
+        <field name="name">Waki Receipts</field>
+        <field name="res_model">waki.move</field>
+        <field name="view_mode">list,form,pivot</field>
+        <field name="domain">[('move_type', 'in', ('purchase_receipt', 'purchase_return'))]</field>
+    </record>
+
+    <record id="action_waki_adjustment" model="ir.actions.act_window">
+        <field name="name">Waki Stock Adjustments</field>
+        <field name="res_model">waki.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', '=', 'adjustment')]</field>
+        <field name="context">{'default_move_type': 'adjustment'}</field>
+    </record>
+</odoo>

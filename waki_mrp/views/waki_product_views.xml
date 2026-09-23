@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_inherit_waki" model="ir.ui.view">
+        <field name="name">product.template.form.waki</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_waki_boms" type="object" class="oe_stat_button"
+                        icon="fa-flask" groups="waki_mrp.group_waki_user" invisible="type != 'consu'">
+                    <field name="waki_bom_count" widget="statinfo" string="Shadow BoMs"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_waki_product_template" model="ir.actions.act_window">
+        <field name="name">Waki Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('type', '=', 'consu')]</field>
+        <field name="context">{'default_type': 'consu', 'default_is_storable': True}</field>
+    </record>
+</odoo>

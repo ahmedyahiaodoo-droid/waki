@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_waki_warehouse_list" model="ir.ui.view">
+        <field name="name">waki.warehouse.list</field>
+        <field name="model">waki.warehouse</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="warehouse_id"/>
+                <field name="sync_receipts"/>
+                <field name="sync_manufacturing"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_waki_warehouse_form" model="ir.ui.view">
+        <field name="name">waki.warehouse.form</field>
+        <field name="model">waki.warehouse</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_initialize_from_real_stock" type="object"
+                            string="Initialize From Odoo Stock" class="btn-secondary"
+                            confirm="Copy current on-hand quantities of the Odoo warehouse as the waki opening balance?"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_stock" type="object" class="oe_stat_button" icon="fa-cubes">
+                            <field name="stock_count" widget="statinfo" string="Products"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Waki Main Warehouse"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="warehouse_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="sync_receipts"/>
+                            <field name="sync_manufacturing"/>
+                            <field name="allow_negative"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_waki_warehouse" model="ir.actions.act_window">
+        <field name="name">Waki Warehouses</field>
+        <field name="res_model">waki.warehouse</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

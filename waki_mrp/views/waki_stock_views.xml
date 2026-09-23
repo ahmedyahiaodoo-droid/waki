@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_waki_stock_list" model="ir.ui.view">
+        <field name="name">waki.stock.list</field>
+        <field name="model">waki.stock</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0"
+                  decoration-danger="quantity &lt; 0" decoration-muted="quantity == 0">
+                <field name="waki_warehouse_id"/>
+                <field name="product_id"/>
+                <field name="quantity" sum="Total"/>
+                <field name="uom_id" groups="uom.group_uom"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_waki_stock_search" model="ir.ui.view">
+        <field name="name">waki.stock.search</field>
+        <field name="model">waki.stock</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="waki_warehouse_id"/>
+                <filter name="positive" string="Positive" domain="[('quantity', '&gt;', 0)]"/>
+                <filter name="negative" string="Negative" domain="[('quantity', '&lt;', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_wh" string="Waki Warehouse" context="{'group_by': 'waki_warehouse_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_waki_stock_pivot" model="ir.ui.view">
+        <field name="name">waki.stock.pivot</field>
+        <field name="model">waki.stock</field>
+        <field name="arch" type="xml">
+            <pivot string="Waki Stock">
+                <field name="product_id" type="row"/>
+                <field name="waki_warehouse_id" type="col"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_waki_stock" model="ir.actions.act_window">
+        <field name="name">Waki Stock On Hand</field>
+        <field name="res_model">waki.stock</field>
+        <field name="view_mode">list,pivot</field>
+    </record>
+</odoo>
